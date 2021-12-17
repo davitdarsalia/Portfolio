@@ -15,23 +15,39 @@ export const MainPage: React.FC<Props> = ({}) => {
     const [userName, setUserName] = useState<string>('UserName')
     const [messages, setMessages] = useState<Array<Message>>([])
     const [message, setMessage] = useState<string>('')
+    let allMessages: any = []
 
-    const Submit = (e: any) => {
-        e.preventDefault()
-    }
+
 
     useEffect(() => {
         Pusher.logToConsole = true;
 
-        const pusher = new Pusher('079e2e0561be89d9d5eb', {
-            cluster: 'ap2'
+        const pusher = new Pusher('', {
+            cluster: ''
         });
 
         const channel = pusher.subscribe('chat');
         channel.bind('message', function(data: any) {
+            allMessages.push(data)
+            setMessages(allMessages)
             alert(JSON.stringify(data));
         });
     })
+
+    const Submit =  async(e: any) => {
+        e.preventDefault();
+
+        await fetch('http://localhost:8000/api/messages', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userName,
+                message
+            })
+        });
+
+        setMessage('');
+    }
 
   return (
       <div className="container">
