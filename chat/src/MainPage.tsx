@@ -1,4 +1,8 @@
 import React, {useEffect, useState} from "react";
+import Pusher from "pusher-js";
+
+import './App.css'
+
 
 interface Props {}
 
@@ -12,8 +16,21 @@ export const MainPage: React.FC<Props> = ({}) => {
     const [messages, setMessages] = useState<Array<Message>>([])
     const [message, setMessage] = useState<string>('')
 
-    useEffect(() => {
+    const Submit = (e: any) => {
+        e.preventDefault()
+    }
 
+    useEffect(() => {
+        Pusher.logToConsole = true;
+
+        const pusher = new Pusher('079e2e0561be89d9d5eb', {
+            cluster: 'ap2'
+        });
+
+        const channel = pusher.subscribe('chat');
+        channel.bind('message', function(data: any) {
+            alert(JSON.stringify(data));
+        });
     })
 
   return (
@@ -43,8 +60,8 @@ export const MainPage: React.FC<Props> = ({}) => {
                   ))
               }
           </div>
-          <form action="">
-              <input type="text" className={"form-control"} placeholder={"Write A Message"}/>
+          <form action="" onSubmit={e => Submit(e)}>
+              <input onChange={e => setMessage(e.currentTarget.value)} type="text" className={"form-control"} placeholder={"Write A Message"}/>
           </form>
       </div>
       </div>
